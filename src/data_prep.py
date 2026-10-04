@@ -1,5 +1,3 @@
-"""Prepare the available-image subset of official VQA v2 validation data."""
-
 import argparse
 from collections import Counter
 import hashlib
