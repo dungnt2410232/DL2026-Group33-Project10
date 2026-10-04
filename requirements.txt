@@ -1,7 +1,8 @@
-torch
-torchvision
-transformers
-pillow
+# Use Kaggle's preinstalled PyTorch and torchvision.
+transformers>=4.44,<5
 pandas
-scikit-learn
+numpy
+Pillow
 tqdm
+matplotlib
+scikit-learn

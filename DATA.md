@@ -1,25 +1,31 @@
-# VQA-Project_
-# Dataset Documentation: VQA Dataset
+# Dataset Information
 
-## 1. Official Dataset Source & Version
-- **Dataset Source:** [Kaggle VQA Dataset](https://www.kaggle.com/datasets/henrychibueze/vqa-dataset)
-- **Base Benchmark:** Visual Question Answering (VQA) v2.0
-- **Version:** Subset v2.0
+## Source
 
-## 2. Data Split
-- **Train split:** 80% used for model fine-tuning.
-- **Validation / Test split:** 20% reserved for detailed evaluation across question categories.
+- **Dataset:** VQA Dataset
+- **Uploader:** henrychibueze
+- **Download:** https://www.kaggle.com/datasets/henrychibueze/vqa-dataset
+- **Kaggle version and original dataset version:** To be confirmed after inspection.
+- **Official original-source URL:** To be confirmed. If the dataset originates from VQA: https://visualqa.org/download.html
 
-## 3. Preprocessing Procedure & Question Tagging
-Questions are categorized into 5 types based on keywords:
-- **Color:** Questions containing keywords like `what color`, `color of`.
-- **Counting:** Questions starting with `how many`, `number of`.
-- **Spatial Relationships:** Positional questions (`where is`, `next to`, `above`, `under`, `left`, `right`).
-- **Object Recognition:** Entity-related questions (`what is`, `is there`, `does the`).
-- **Visual Reasoning:** Contextual reasoning questions (`why`, `what is the person doing`).
+## Access
 
-## 4. Scripts to Reproduce Data
-```bash
-kaggle datasets download -d henrychibueze/vqa-dataset
-unzip vqa-dataset.zip -d data/
-python src/data_prep.py
+Add the dataset as an input to the Kaggle Notebook. Inspect the actual file names and paths under `/kaggle/input/` before loading them.
+
+## Data Split
+
+Preserve official splits if provided. Otherwise, split labeled data into **80% training, 10% validation, and 10% evaluation**, grouping questions by image and using seed **42**. Check duplicate images across splits. Final split sizes and IDs will be recorded after preparation.
+
+## Preprocessing
+
+1. Match images, questions, and answers using their IDs.
+2. Check missing images, empty questions, and duplicate records.
+3. Convert images to RGB and process images/questions with `ViltProcessor`.
+4. Normalize answers consistently for training and evaluation.
+5. Tag questions as object recognition, color, counting, spatial relationships, or visual reasoning; retain unmatched questions as `other`.
+
+## Reproduction
+
+Data preparation will be implemented in `src/data_prep.py` and run from the Kaggle Notebook. The script is not implemented yet. Record the dataset version, exact split IDs, category rules, and preprocessing settings with the experiment.
+
+**Processed dataset download:** Pending. If a processed dataset is created, provide a downloadable link here, subject to the source's redistribution terms.
