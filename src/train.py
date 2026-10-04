@@ -92,3 +92,73 @@ def train(args):
         for step, batch in enumerate(progress):
             inputs = {k: v.to("cuda") for k, v in batch["inputs"].items()}
             group_start = (step // args.accumulation_steps) * args.accumulation_steps
+            group_size = min(args.accumulation_steps, len(train_loader) - group_start)
+            with torch.autocast(device_type="cuda", dtype=torch.float16):
+                loss = model(**inputs).loss
+            if not torch.isfinite(loss):
+                raise RuntimeError(f"Nonfinite loss at epoch {epoch}, batch {step}")
+            scaler.scale(loss / group_size).backward()
+            size = len(batch["metadata"])
+            loss_sum += loss.detach().item() * size
+            example_count += size
+            if (step + 1) % args.accumulation_steps == 0 or step + 1 == len(train_loader):
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+                previous_scale = scaler.get_scale()
+                scaler.step(optimizer)
+                scaler.update()
+                if scaler.get_scale() >= previous_scale:
+                    scheduler.step()
+                optimizer.zero_grad(set_to_none=True)
+            progress.set_postfix(loss=f"{loss_sum/example_count:.3f}")
+
+        model.eval()
+        dev_consensus, dev_exact, dev_count = 0.0, 0.0, 0
+        with torch.inference_mode():
+            for batch in tqdm(dev_loader, desc="Development evaluation"):
+                inputs = {k: v.to("cuda") for k, v in batch["inputs"].items() if k != "labels"}
+                # Match baseline evaluation precision.
+                ids = model(**inputs).logits.argmax(dim=-1).cpu().tolist()
+                for r, idx in zip(batch["metadata"], ids):
+                    prediction = model.config.id2label[idx]
+                    dev_consensus += eval_module.consensus_score(prediction, r["answers"])
+                    dev_exact += float(eval_module.answer_key(prediction) ==
+                                       eval_module.answer_key(r["answer"]))
+                    dev_count += 1
+        score = dev_consensus / dev_count
+        row = {"epoch": epoch, "train_loss": loss_sum/example_count,
+               "dev_exact_match_basic_pct": 100 * dev_exact/dev_count,
+               "dev_consensus_basic_pct": 100 * score}
+        history.append(row)
+        print(json.dumps(row), flush=True)
+        if score > best_score:
+            best_score = score
+            best_dir = args.output_dir / "best"
+            model.save_pretrained(best_dir, safe_serialization=True)
+            processor.save_pretrained(best_dir)
+            (args.output_dir / "best_checkpoint.json").write_text(
+                json.dumps(row, indent=2) + "\n", encoding="utf-8")
+            print("Best checkpoint saved:", best_dir, flush=True)
+        (args.output_dir / "training_history.json").write_text(
+            json.dumps(history, indent=2) + "\n", encoding="utf-8")
+    print("Training complete. Test data was not used for selection.", flush=True)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", default="dandelin/vilt-b32-finetuned-vqa")
+    parser.add_argument("--data-dir", type=Path, default=Path("/kaggle/working/vqa_processed"))
+    parser.add_argument("--output-dir", type=Path, default=Path("/kaggle/working/vilt_finetuned"))
+    parser.add_argument("--epochs", type=int, default=1)
+    parser.add_argument("--batch-size", type=int, default=4)
+    parser.add_argument("--accumulation-steps", type=int, default=4)
+    parser.add_argument("--learning-rate", type=float, default=2e-5)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--limit-train", type=int, default=0)
+    parser.add_argument("--limit-dev", type=int, default=0)
+    args = parser.parse_args()
+    if min(args.epochs, args.batch_size, args.accumulation_steps) < 1:
+        parser.error("epochs, batch-size, and accumulation-steps must be positive")
+    if min(args.limit_train, args.limit_dev) < 0 or args.learning_rate <= 0:
+        parser.error("limits must be nonnegative and learning-rate must be positive")
+    train(args)
