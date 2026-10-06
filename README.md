@@ -96,4 +96,3 @@ The notebook demonstrates Run A predictions with images, questions, and referenc
 - [Kaggle notebook](https://www.kaggle.com/code/dungnt28/vilt-vqa)
 - **Saved outputs / downloads:** (https://www.kaggle.com/code/dungnt28/vilt-vqa/output?scriptVersionId=355785821) — add the saved Kaggle Output version link containing the submitted checkpoints, processed data, and results.
 
-Use a saved output link accessible to the reviewers. Temporary notebook-session download links may expire. If a session restarts, restore the saved files or rerun data preparation before training/evaluation.
