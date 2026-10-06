@@ -1,0 +1,72 @@
+{
+  "model": "/kaggle/working/vilt_run_C/best",
+  "model_revision": null,
+  "data_file": "/kaggle/working/vqa_processed/test.jsonl",
+  "data_sha256": "40409aeefc0c347a7fd299b4fe02a7bb149937800986e43ea3f8290bbd5508c9",
+  "device": "cuda:0",
+  "torch_version": "2.11.0+cu128",
+  "transformers_version": "4.57.6",
+  "batch_size": 8,
+  "max_question_length": 40,
+  "evaluated_examples": 6125,
+  "available_examples": 6125,
+  "partial_run": false,
+  "elapsed_seconds": 117.82908496100026,
+  "normalization": "lowercase and collapse whitespace only",
+  "official_vqa_evaluation": false,
+  "metrics": [
+    {
+      "category": "overall",
+      "count": 6125,
+      "exact_match_basic_pct": 73.66530612244898,
+      "consensus_basic_pct": 83.12653061224553,
+      "unsupported_examples": 108
+    },
+    {
+      "category": "counting",
+      "count": 580,
+      "exact_match_basic_pct": 58.44827586206897,
+      "consensus_basic_pct": 70.98275862068975,
+      "unsupported_examples": 0
+    },
+    {
+      "category": "color",
+      "count": 550,
+      "exact_match_basic_pct": 79.45454545454545,
+      "consensus_basic_pct": 88.60000000000002,
+      "unsupported_examples": 0
+    },
+    {
+      "category": "spatial",
+      "count": 101,
+      "exact_match_basic_pct": 54.45544554455446,
+      "consensus_basic_pct": 67.32673267326733,
+      "unsupported_examples": 4
+    },
+    {
+      "category": "reasoning",
+      "count": 44,
+      "exact_match_basic_pct": 40.90909090909091,
+      "consensus_basic_pct": 45.90909090909091,
+      "unsupported_examples": 1
+    },
+    {
+      "category": "object",
+      "count": 199,
+      "exact_match_basic_pct": 66.83417085427136,
+      "consensus_basic_pct": 75.07537688442208,
+      "unsupported_examples": 11
+    },
+    {
+      "category": "other",
+      "count": 4651,
+      "exact_match_basic_pct": 75.89765641797463,
+      "consensus_basic_pct": 85.03332616641617,
+      "unsupported_examples": 92
+    }
+  ],
+  "macro_five_categories": {
+    "exact_match_basic_pct": 60.02030572490624,
+    "consensus_basic_pct": 69.57879181749402
+  }
+}
