@@ -49,8 +49,6 @@ This generates `train.jsonl`, `dev.jsonl`, and `test.jsonl` in `/kaggle/working/
 
 **Processed data download:** Download `prepared_data.zip` from the [saved Kaggle Output version](https://www.kaggle.com/code/dungnt28/vilt-vqa/output?scriptVersionId=355785821).
 
-The ZIP contains processed records, not images. Obtain images from the source above. Image paths may need updating if the input location changes. The saved Output must be accessible to reviewers.
-
 ## Checkpoint Exposure
 
 The starting checkpoint, `dandelin/vilt-b32-finetuned-vqa`, is already fine-tuned on VQAv2. Image-disjoint project splits do not guarantee that Test examples were unseen during the checkpoint's earlier training.
